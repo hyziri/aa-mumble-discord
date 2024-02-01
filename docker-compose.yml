@@ -18,6 +18,39 @@ services:
     networks:
       - allianceauth
 
+  traefik:
+    image: "traefik:latest"
+    container_name: "traefik"
+    restart: always
+    command:
+      - --log.level=INFO
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=traefik
+      - --entrypoints.web.address=:80
+      - --entryPoints.websecure.address=:443
+      - --entryPoints.mumble_tcp.address=:64738
+      - --entryPoints.mumble_udp.address=:64738/udp
+      # ACME
+      - --certificatesresolvers.primary.acme.httpchallenge=true
+      - --certificatesresolvers.primary.acme.httpchallenge.entrypoint=web
+      - --certificatesresolvers.primary.acme.email=${ESI_USER_CONTACT_EMAIL}
+      - --certificatesresolvers.primary.acme.storage=/letsencrypt/acme.json
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+      - 64738:64738
+      - 64738:64738/udp
+    volumes:
+      - "./data/letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+
   nginx:
     image: nginx:1.21
     restart: always
@@ -26,9 +59,10 @@ services:
       - static-volume:/var/www/myauth/static
     depends_on:
       - allianceauth
+      - traefik
     labels:
       - traefik.enable=true
-      - traefik.http.routers.auth.rule=Host(`auth.black-rose.space`)
+      - traefik.http.routers.auth.rule=Host(`${AUTH_SUBDOMAIN}.${DOMAIN}`)
       - traefik.http.routers.auth.entrypoints=websecure
       - traefik.http.routers.auth.tls.certresolver=primary
     networks:
@@ -49,6 +83,7 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro    
     depends_on:
       - auth_mysql
+      - traefik
     networks:
       - allianceauth
       - traefik
@@ -59,7 +94,7 @@ services:
       - traefik.udp.services.mumble.loadbalancer.server.port=64738
       - traefik.tcp.routers.mumble.entrypoints=mumble_tcp
       - traefik.tcp.routers.mumble.service=mumble
-      - traefik.tcp.routers.mumble.rule=HostSNI(`mumble.black-rose.space`)
+      - traefik.tcp.routers.mumble.rule=HostSNI(`${MUMBLE_SUBDOMAIN}.${DOMAIN}`)
       - traefik.tcp.services.mumble.loadbalancer.server.port=64738
       - traefik.tcp.routers.mumble.tls.passthrough=true
 
@@ -101,4 +136,3 @@ volumes:
 networks:
   allianceauth:
   traefik:
-    external: true

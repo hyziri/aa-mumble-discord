@@ -24,6 +24,9 @@ sed -i.bak 's/%DOMAIN%/'${domain}'/g' .env
 read -p "Enter the subdomain for auth: " subdomain
 sed -i.bak 's/%AUTH_SUBDOMAIN%/'${subdomain}'/g' .env
 
+read -p "Enter the subdomain for mumble: " mumblesubdomain
+sed -i.bak 's/%MUMBLE_SUBDOMAIN%/'${mumblesubdomain}'/g' .env
+
 read -p "Enter an email address. This is requested by CCP if there are any issues with your ESI application, and is not used in any other way by AllianceAuth: " email
 sed -i.bak 's/%ESI_USER_CONTACT_EMAIL%/'${email}'/g' .env
 
