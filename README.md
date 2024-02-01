@@ -13,3 +13,8 @@
 - `auth createsuperuser`
 
 You're done, login to your site with the admin account.
+
+## Mumble Certificates
+
+Certificates have to be created for mumble manually as an automatic solution has not been added here yet (feel free to create a pull request if you wish).
+To get mumble certificates install certbot <https://certbot.eff.org/> & run it for your mumble domain, if mumble has trouble accessing the certificates then you may need to change the permissions on the letsencrypt folder containing the certs.

@@ -58,3 +58,11 @@ echo "6. Create the server then right click the icon on the left sidebar and cli
 
 read -p "Enter Discord Server ID: " discordserverid
 sed -i.bak 's/%AA_DISCORD_SERVER_ID%/'${discordserverid}'/g' .env
+
+source ./.env
+cp setup.base.sql setup.sql
+
+# Create init SQL file for auth database with users
+sed -i.bak 's/authpass/'"$AA_DB_PASSWORD"'/g' setup.sql
+rm *.bak
+rm .env.bak
