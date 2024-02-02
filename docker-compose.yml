@@ -30,8 +30,6 @@ services:
       - --providers.docker.network=traefik
       - --entrypoints.web.address=:80
       - --entryPoints.websecure.address=:443
-      - --entryPoints.mumble_tcp.address=:64738
-      - --entryPoints.mumble_udp.address=:64738/udp
       # ACME
       - --certificatesresolvers.primary.acme.httpchallenge=true
       - --certificatesresolvers.primary.acme.httpchallenge.entrypoint=web
@@ -41,8 +39,6 @@ services:
       - 80:80
       - 443:443
       - 8080:8080
-      - 64738:64738
-      - 64738:64738/udp
     volumes:
       - "./data/letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -83,20 +79,11 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro    
     depends_on:
       - auth_mysql
-      - traefik
+    ports:
+      - 64738:64738
+      - 64738:64738/udp
     networks:
       - allianceauth
-      - traefik
-    labels:
-      - traefik.enable=true
-      - traefik.udp.routers.mumble.entrypoints=mumble_udp
-      - traefik.udp.routers.mumble.service=mumble
-      - traefik.udp.services.mumble.loadbalancer.server.port=64738
-      - traefik.tcp.routers.mumble.entrypoints=mumble_tcp
-      - traefik.tcp.routers.mumble.service=mumble
-      - traefik.tcp.routers.mumble.rule=HostSNI(`${MUMBLE_SUBDOMAIN}.${DOMAIN}`)
-      - traefik.tcp.services.mumble.loadbalancer.server.port=64738
-      - traefik.tcp.routers.mumble.tls.passthrough=true
 
   redis:
     image: redis:6.2
