@@ -69,7 +69,10 @@ INSTALLED_APPS += [
     # 'allianceauth.optimer',
     # 'allianceauth.permissions_tool',
     # 'allianceauth.srp',
-    # 'allianceauth.timerboard',
+    'eveuniverse',
+    'structures',
+    'mumbletemps',
+    'allianceauth.timerboard',
 
     # https://allianceauth.readthedocs.io/en/latest/features/services/index.html
     'allianceauth.services.modules.discord',
@@ -106,3 +109,13 @@ CELERYBEAT_SCHEDULE['discord.update_all_usernames'] = {
 }
 
 MUMBLE_URL = "mumble.black-rose.space"
+ESI_CONNECTION_POOL_MAXSIZE = 20
+
+CELERYBEAT_SCHEDULE['structures_update_all_structures'] = {
+    'task': 'structures.tasks.update_all_structures',
+    'schedule': crontab(minute='*/30'),
+}
+CELERYBEAT_SCHEDULE['structures_fetch_all_notifications'] = {
+    'task': 'structures.tasks.fetch_all_notifications',
+    'schedule': crontab(minute='*/5'),
+}

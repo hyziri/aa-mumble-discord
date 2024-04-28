@@ -31,6 +31,9 @@ WORKDIR ${AUTH_HOME}
 RUN git clone https://gitlab.com/aaronkable/mumble-authenticator.git 
 
 WORKDIR ${AUTH_HOME}/mumble-authenticator
+RUN git remote add upstream git@gitlab.com:aaronkable/mumble-authenticator.git
+RUN git fetch upstream
+RUN git checkout upstream/master
 
 # Install python dependencies
 RUN pip install --upgrade pip

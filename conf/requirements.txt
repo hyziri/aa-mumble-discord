@@ -1,0 +1,4 @@
+allianceauth-mumbletemps
+django-eveuniverse
+aa-structures
+superlance
